@@ -140,7 +140,7 @@ int main(int argc, char* argv[]){
     double total_time = 0;
     for (int sourceNode : query_nodes) {
       start = clock();
-      g.SpeedPPR(sourceNode, param.alpha, W, rmax); 
+      g.Accelerated(sourceNode, param.alpha, W, rmax); 
       end = clock();
       total_time += (double)(end-start)/CLOCKS_PER_SEC;
       cout << "      Computation Time: " << (double)(end-start)/CLOCKS_PER_SEC << endl;

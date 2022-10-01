@@ -459,6 +459,11 @@ void Graph::Accelerated(int sourceNode, double alpha, double W, double rmax)
 
   residue[sourceNode] = 1.0;
 
+  double I = 0.5*n;
+  double tmp_1 = m - (I/(2*log(1-alpha)));
+  double tmp_2 = n/alpha + ((I * log(1/W))/(2 * log(1-alpha)));
+  rmax = 1/(exp(tmp_2/tmp_1)*m);
+
   queue<int> active;
   active.push(sourceNode);
 
@@ -808,33 +813,25 @@ void Graph::Remedy(int sourceNode, double alpha, double W)
 
 void Graph::Accelerated_Remedy(int sourceNode, double alpha, double W)
 {
-  clock_t start, end;
   Random r = Random();
   long global_total = 0;
-  int local_total = 0;
-  double global_rsum = 0.0;
   int* globalRW = new int[n];
-  int* localRW = new int[n];
-  int debug_global = 0;
+  bool* localRW = new bool[n];
   for (int i = 0; i < n; i++) {
-    localRW[i] = -1;
+    localRW[i] = false;
     globalRW[i] = 0;
     if (residue[i] > 0.0) {
-      localRW[i] = i;
-      local_total++;
-      int Wi = ceil(residue[i] * W);
-      if (Wi > 1) {
-        debug_global++;
-        global_total += Wi - 1;
-        globalRW[i] = Wi - 1;
-        global_rsum += (Wi-1)/W;
-        residue[i] -= (Wi-1)/W;
+      localRW[i] = true;
+      int Wi = floor(residue[i] * W);
+      if (Wi >= 1) {
+        global_total += Wi;
+        globalRW[i] = Wi;
+        residue[i] -= Wi/W;
       }
     }
   }
 
   // Independent Random Walk
-  double global_push = global_rsum / global_total;
   while (global_total > 0) {
     for (int i = 0; i < n; i++) {
       if (globalRW[i] > 0) {
@@ -850,7 +847,7 @@ void Graph::Accelerated_Remedy(int sourceNode, double alpha, double W)
             }
           } else {
             global_total--;
-            reserve[i] += global_push;
+            reserve[i] += 1/W;
           }
         }
         globalRW[i] = 0;
@@ -859,25 +856,20 @@ void Graph::Accelerated_Remedy(int sourceNode, double alpha, double W)
   }
 
   // Dependent Random Walk
-  while (local_total > 0) {
-    for (int i = 0; i < n; i++) {
-      int currentNode = localRW[i];
-      if (currentNode != -1) {
-        if (r.generateReal() > alpha) {
-          int len = outDegree(currentNode);
-          if (len == 0) {
-            localRW[i] = sourceNode;
-          } else {
-            int neighbor = r.generateInt() % len;
-            int nextnode = outedge[outoffset[currentNode] + neighbor];
-            localRW[i] = nextnode;
-          }
+  for (int i = 0; i < n; i++) {
+    if (localRW[i] == true) {
+      int currentNode = i;
+      double current_residue = residue[currentNode];
+      while (r.generateReal() > alpha) {
+        int len = outDegree(currentNode);
+        if (len == 0) {
+          currentNode = sourceNode;
         } else {
-          reserve[currentNode] += residue[i];
-          localRW[i] = -1;
-          local_total--;
+          int neighbor = r.generateInt() % len;
+          currentNode = outedge[outoffset[currentNode] + neighbor];
         }
       }
+      reserve[currentNode] += current_residue;
     }
   }
   delete[] globalRW;
