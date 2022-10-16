@@ -14,5 +14,6 @@
 using namespace std;
 
 void IdRandom (const string& readfilename, const string& attributefilename, const string& writefilename);
+void ToDirected(const string& readfilename, const string& writefilename);
 
 #endif

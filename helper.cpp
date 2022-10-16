@@ -6,7 +6,7 @@ Param param;
 Param argParse(int argnum, char** argname)
 {
   vector<string> Algorithms {
-    "MonteCarlo", "ForwardPush", "Fora", "ResAcc", "SpeedPPR", "Accelerated","BinaryGenerate", "QueryGenerate", "IdRandom"
+    "MonteCarlo", "ForwardPush", "Fora", "ResAcc", "SpeedPPR", "Accelerated","ToDirected", "QueryGenerate"
   };
   Param rtn;
   unordered_set<string> algos(Algorithms.begin(), Algorithms.end());
@@ -35,34 +35,12 @@ Param argParse(int argnum, char** argname)
     } else if (para == "-graph") {
       rtn.graph_name = arg;
       cout << "Input Graph: " << rtn.graph_name << endl;
-    } else if (para == "-binary") {
-      rtn.binary_name = arg;
-      cout << "Input Binary Graph: " << rtn.binary_name << endl;
-    } else if (para == "-random_binary") {
-      rtn.random_binary_name = arg;
-      cout << "Input Random Binary Graph: " << rtn.random_binary_name << endl;
     } else if (para == "-attribute") {
       rtn.attribute_name = arg;
       cout << "Attribute File: " << rtn.attribute_name << endl;
-    } else if (para == "-directed") {
-      if (arg == "yes") {
-        cout << "Directed" << endl;
-        rtn.directed = true;
-      } else if (arg == "no") {
-        cout << "Undirected" << endl;
-        rtn.directed = true;
-        rtn.directed = false;
-      } else {
-        cout << "Unknown Option." << endl;
-        usage_message();
-        exit(0);
-      }
     } else if (para == "-query") {
       rtn.query_name = arg;
       cout << "Query File: " << rtn.query_name << endl;
-    } else if (para == "-result_directory") {
-      rtn.result_directory = arg;
-      cout << "Result Directory: " << rtn.result_directory << endl;
     } else if (para == "-query_size") {
       regex size_check(R"([1-9]\d{0,})");
       if (regex_match(arg, size_check)) {
@@ -99,5 +77,5 @@ Param argParse(int argnum, char** argname)
 }
 
 void usage_message() {
-  cout << "Usage: ./CachePush -algo <algorithm> [-graph <graph-path>] [-binary <binary-path>] [-attribute <attribute-path>] [-directed <yes or no>] [-query <query-path>] [-quer_sizey <must be greater than 1>] [-alpha <must be between 0 and 1>] [-epsilon <must be between 0 and 1>]" << endl;
+  cout << "Usage: ./CachePush -algo <algorithm> [-graph <graph-path>] [-attribute <attribute-path>] [-query <query-path>] [-quer_sizey <must be greater than 1>] [-alpha <must be between 0 and 1>] [-epsilon <must be between 0 and 1>]" << endl;
 }

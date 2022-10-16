@@ -25,19 +25,16 @@ int main(int argc, char* argv[]){
   ios::sync_with_stdio(false);
   param = argParse(argc, argv);
 
-  if (param.algorithm == "IdRandom") {
-    IdRandom(param.binary_name, param.attribute_name, param.random_binary_name);
+  if (param.algorithm == "ToDirected") {
+    ToDirected(param.graph_name, param.graph_name);
     return 0;
   }
 
   Graph g;
   clock_t start, end;
-  if (param.algorithm == "BinaryGenerate") {
-    g.binaryWrite(param.graph_name, param.binary_name, param.attribute_name, param.directed);
-    return 0;
-  } else if (!param.binary_name.empty()) {
+  if (!param.graph_name.empty()) {
     start=clock();
-    g.binaryLoad(param.binary_name, param.attribute_name);
+    g.graphLoad(param.graph_name, param.attribute_name);
     end=clock();
     cout << "Load Time: " << (double)(end-start)/CLOCKS_PER_SEC << endl;
     cout << "--------------------------------------" << endl;
@@ -54,12 +51,12 @@ int main(int argc, char* argv[]){
     }
     return 0;
   }
-
+  
   // Personalized PageRank Computation
   vector<int> query_nodes(param.query_size);
   g.queryLoad(param.query_size, query_nodes, param.query_name);
   double W = (2 * (2 * param.epsilon/3 + 2) * log(g.n) * g.n) / (param.epsilon * param.epsilon);
-  double rmax = 1/W;
+  double rmax = 1/sqrt(g.m * W);
 
   if (param.algorithm == "ForwardPush") {
     double total_time = 0;
@@ -122,6 +119,7 @@ int main(int argc, char* argv[]){
   }
   
   if (param.algorithm == "SpeedPPR") {
+    rmax = 1/W;
     double total_time = 0;
     for (int sourceNode : query_nodes) {
       start = clock();

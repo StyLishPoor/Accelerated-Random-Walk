@@ -3,7 +3,7 @@
 
 Graph::Graph()
 {
-  n = m = total_n = 0;
+  n = m = 0;
 }
 
 Graph::~Graph()
@@ -22,7 +22,6 @@ void Graph::clear()
 {
   n = 0;
   m = 0;
-  total_n = 0;
   file_name.clear();
   delete[] outdegree;
   delete[] indegree;
@@ -41,14 +40,20 @@ void Graph::reset()
   }
 }
 
-void Graph::graphLoad(const string& readfilename)
+void Graph::graphLoad(const string& readfilename, const string& attributefilename)
 {
-  ifstream ifs(readfilename);
+  ifstream ifs(readfilename, ios::in);
   if(!ifs) {
     cout << "Cannot open: " << readfilename << endl;
     exit(1);
   }
-  ifs >> n;
+
+  ifstream ifs_attribute(attributefilename, ios::in);
+  if (!ifs_attribute) {
+    cout << "Cannot open: " << attributefilename << endl;
+    exit(1);
+  }
+  ifs_attribute >> n >> m;
 
   outdegree = new int[n];
   indegree = new int[n];
@@ -87,139 +92,6 @@ void Graph::graphLoad(const string& readfilename)
     inedge[inoffset[to] + inpos[to]] = from;
     inpos[to]++;
   }
-}
-
-void Graph::binaryLoad(const string& readfilename, const string& attributefilename)
-{
-  ifstream ifs(readfilename, ios::in | ios::binary);
-  if(!ifs) {
-    cout << "Cannot open: " << readfilename << endl;
-    exit(1);
-  }
-
-  ifstream ifs_attribute(attributefilename);
-  if (!ifs_attribute) {
-    cout << "Cannot open: " << attributefilename << endl;
-    exit(1);
-  }
-  ifs_attribute >> n >> m >> total_n;
-
-  outdegree = new int[n];
-  indegree = new int[n];
-  residue = new double[n];
-  reserve = new double[n];
-  outoffset = new int[n+1];
-  inoffset = new int[n+1];
-  outedge = new int[m];
-  inedge = new int[m];
-
-  vector<pair<int, int>> edge(m);
-  ifs.read((char *)&edge[0], edge.size() * sizeof(edge[0]));
-  for (long long i = 0; i < m; i++) {
-    int from = edge[i].first;
-    int to = edge[i].second;
-    outdegree[from]++;
-    indegree[to]++;
-  }
-
-
-  outoffset[0] = 0;
-  inoffset[0] = 0;
-
-  for (int i = 0; i < n; i++) {
-    outoffset[i+1] = outoffset[i] + outdegree[i];
-    inoffset[i+1] = inoffset[i] + indegree[i];
-  }
-
-  vector<int> inpos(n);
-  sort(edge.begin(), edge.end());
-  for (long long i = 0; i < m; i++) {
-    int from = edge[i].first;
-    int to = edge[i].second;
-    outedge[i] = to;
-    inedge[inoffset[to] + inpos[to]] = from;
-    inpos[to]++;
-  }
-}
-
-void Graph::binaryWrite(const string& readfilename, const string& writefilename, const string& attributefilename, bool directed)
-{
-  ifstream ifs(readfilename);
-  if(!ifs) {
-    cout << "Cannot open: " << readfilename << endl;
-    exit(1);
-  }
-
-  unordered_set<int> nodes;
-  vector<pair<int, int>> edge;
-  edge.reserve(5000000000);
-  int from, to;
-  int max_id = -1;
-
-  if (directed) {
-    while (ifs >> from >> to) {
-      nodes.insert(from);
-      nodes.insert(to);
-      edge.push_back(make_pair(from, to));
-      if (from > max_id) {
-        max_id = from ;
-      }
-      if (to > max_id) {
-        max_id = to;
-      }
-    }
-  } else {
-    while (ifs >> from >> to) {
-      nodes.insert(from);
-      nodes.insert(to);
-      edge.push_back(make_pair(from, to));
-      edge.push_back(make_pair(to, from));
-      if (from > max_id) {
-        max_id = from ;
-      }
-      if (to > max_id) {
-        max_id = to;
-      }
-    }
-  }
-  n = max_id + 1;
-  m = edge.size();
-  total_n = nodes.size();
-  cout << "Max ID: " << n << endl;
-  cout << "Nodes: " << total_n << endl;
-  cout << "Edges: " << m << endl;
-
-  ifs.close();
-
-  outdegree = new int[n];
-  indegree = new int[n];
-  residue = new double[n];
-  reserve = new double[n];
-  outoffset = new int[n+1];
-  inoffset = new int[n+1];
-  outedge = new int[m];
-  inedge = new int[m];
-
-  sort(edge.begin(), edge.end());
-
-  ofstream ofs_attribute(attributefilename);
-  if (!ofs_attribute) {
-    cout << "Cannot open: " << attributefilename << endl;
-    exit(1);
-  }
-
-  ofs_attribute << n <<  " " << m << " " << total_n;
-  ofs_attribute.close();
-
-  ofstream ofs(writefilename, ios::out | ios::binary);
-  if (!ofs) {
-    cout << "Cannot open: " << writefilename << endl;
-    exit(1);
-  }
-
-  ofs.write((char *)&edge[0], edge.size() * sizeof(edge[0]));
-  ofs.close();
-  cout << "Binary wrote" << endl;
 }
 
 void Graph::ResidueRemain()
@@ -416,7 +288,6 @@ void Graph::Fora(int sourceNode, double alpha, double W, double rmax)
 
   queue<int> active;
   active.push(sourceNode);
-
   while(active.size() > 0) {
     int tempNode = active.front();
     active.pop();
@@ -447,7 +318,6 @@ void Graph::Fora(int sourceNode, double alpha, double W, double rmax)
       }
     }
   }
-
   Remedy(sourceNode, alpha, W);
 }
 
@@ -458,11 +328,6 @@ void Graph::Accelerated(int sourceNode, double alpha, double W, double rmax)
   idx[sourceNode] = true;
 
   residue[sourceNode] = 1.0;
-
-  double I = 0.5*n;
-  double tmp_1 = m - (I/(2*log(1-alpha)));
-  double tmp_2 = n/alpha + ((I * log(1/W))/(2 * log(1-alpha)));
-  rmax = 1/(exp(tmp_2/tmp_1)*m);
 
   queue<int> active;
   active.push(sourceNode);
@@ -497,7 +362,6 @@ void Graph::Accelerated(int sourceNode, double alpha, double W, double rmax)
       }
     }
   }
-
   Accelerated_Remedy(sourceNode, alpha, W);
 }
 
@@ -519,7 +383,6 @@ void Graph::ResAcc(int sourceNode, int h, double alpha, double W, double rmax_ho
 
   queue<int> active;
 
-  clock_t start, end;
   // sourceNode
   int out_deg = outDegree(sourceNode);
   reserve[sourceNode] = alpha;
@@ -659,7 +522,6 @@ void Graph::ResAcc(int sourceNode, int h, double alpha, double W, double rmax_ho
       }
     }
   }
-
   Remedy(sourceNode, alpha, W);
 }
 
@@ -677,7 +539,6 @@ void Graph::SpeedPPR(int sourceNode, double alpha, double W, double rmax)
   double lambda = rmax * m;
   double scanThr = n/4;
   double rsum = 1.0;
-  clock_t start, end;
   while(active.size() > 0 && active.size() < scanThr && rsum > lambda) {
     int tempNode = active.front();
     active.pop();

@@ -46,3 +46,31 @@ void IdRandom (const string& readfilename, const string& attributefilename, cons
   cout << "Random Binary wrote" << endl;
 
 }
+
+void ToDirected(const string& readfilename, const string& writefilename)
+{
+  ifstream ifs(readfilename, ios::in);
+  if(!ifs) {
+    cout << "Cannot open: " << readfilename << endl;
+    exit(1);
+  }
+
+  vector<pair<int, int>> edge;
+  edge.reserve(500000000);
+  int from, to;
+  while (ifs >> from >> to) {
+    edge.push_back(make_pair(from, to));
+    edge.push_back(make_pair(to, from));
+  }
+  ifs.close();
+
+  ofstream ofs(writefilename, ios::out);
+  if (!ofs) {
+    cout << "Cannot open: " << writefilename << endl;
+  }
+
+  for (long i = 0; i < edge.size(); i++) {
+    ofs << edge[i].first << " " << edge[i].second << endl;;
+  }
+  ofs.close();
+}

@@ -27,7 +27,6 @@ using namespace std;
 
 class Graph{
   public:
-    int total_n;
     int n;
     long long m;
     string file_name;
@@ -50,9 +49,7 @@ class Graph{
     ~Graph();
     void clear();
     void reset();
-    void graphLoad(const string& readfilename);
-    void binaryLoad(const string& readfilename, const string& attributefilename);
-    void binaryWrite(const string& readfilename, const string& writefilename, const string& attributefilename, bool directed);
+    void graphLoad(const string& readfilename, const string& attributefilename);
     void ResidueRemain();
     void ReserveTotal();
     void PPRatio();
