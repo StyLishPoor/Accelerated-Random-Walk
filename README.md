@@ -23,7 +23,7 @@ $ ./SSPPR -algo <algorithm> [-graph <graph-path>] [-attribute <attribute-path>] 
 - algorithm
   - ForwardPush
   - MonteCarlo
-  - [FORA](https://dl.acm.org/doi/abs/10.1145/3097983.3098072) (KDD'17)
+  - [Fora](https://dl.acm.org/doi/abs/10.1145/3097983.3098072) (KDD'17)
   - [ResAcc](https://ieeexplore.ieee.org/abstract/document/9101811) (ICDE'20)
   - [SpeedPPR](https://dl.acm.org/doi/abs/10.1145/3448016.3457298) (SIGMOD'21)
   - Accelerated (**the proposed method**)
