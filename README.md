@@ -3,7 +3,7 @@ This repository is for "Node-Centric Random Walk for Fast Index-Free Personalize
 
 ## Environmnets
 - C++ 17
-- GCC 9.4.0
+- G++ 9.4.0
 - Ubuntu 20.04
 - SFMT 1.5.1 (SIMD-Oriented Fast Mersenne Twister)
 
