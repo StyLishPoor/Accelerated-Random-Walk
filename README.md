@@ -42,7 +42,7 @@ $ ./SSPPR -algo Accelerated -graph data/dblp/graph.txt -attribute data/dblp/grap
  
 ## Graph Format
 Input grpah should follow [SNAP](http://snap.stanford.edu/data/) format. 
-Attribute file contains the maximum node ID and edges respectively.
+Attribute file contains the maximum node ID and the number of edges respectively.
 
 You can see the example in ```./data/dblp/``` folder.
 
