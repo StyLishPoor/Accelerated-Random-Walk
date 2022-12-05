@@ -77,5 +77,5 @@ Param argParse(int argnum, char** argname)
 }
 
 void usage_message() {
-  cout << "Usage: ./CachePush -algo <algorithm> [-graph <graph-path>] [-attribute <attribute-path>] [-query <query-path>] [-quer_sizey <must be greater than 1>] [-alpha <must be between 0 and 1>] [-epsilon <must be between 0 and 1>]" << endl;
+  cout << "Usage: ./SSPPR -algo <algorithm> -graph <graph-path> -attribute <attribute-path> -query <query-path> -quer_sizey <must be greater than 1> [-alpha <must be between 0 and 1>] [-epsilon <must be between 0 and 1>]" << endl;
 }
